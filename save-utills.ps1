@@ -1,7 +1,20 @@
+# save-utils.ps1
+# Script para respaldar y restaurar save states del juego R.E.P.O.
+
 $repoPath = Join-Path $env:USERPROFILE "AppData\LocalLow\semiwork\Repo"
 $savesPath = Join-Path $repoPath "saves"
-
 $backupPattern = "REPO_SAVE_*"
+
+function Select-DirectoryFromList($directories) {
+    Write-Host "Se encontraron múltiples directorios:"
+    for ($i = 0; $i -lt $directories.Count; $i++) {
+        Write-Host "$($i + 1)) $($directories[$i].Name)"
+    }
+    do {
+        $selection = Read-Host "Ingrese el número del directorio que desea usar"
+    } while (-not ($selection -as [int]) -or $selection -lt 1 -or $selection -gt $directories.Count)
+    return $directories[$selection - 1]
+}
 
 Write-Host "Seleccione una opción:"
 Write-Host "1) Generar backup"
@@ -19,57 +32,57 @@ switch ($option) {
         }
 
         $foundDirs = Get-ChildItem -Path $savesPath -Directory -Filter $backupPattern
-        
+
         if ($foundDirs.Count -eq 0) {
-            Write-Host "No se encontró ningún directorio de guardado en 'saves'. Pausando ejecución."
+            Write-Host "No se encontró ningún directorio de guardado en 'saves'."
             Pause
             exit
         }
-        elseif ($foundDirs.Count -gt 1) {
-            Write-Host "Se encontraron múltiples directorios de guardado en 'saves'. Pausando ejecución."
-            Pause
-            exit
+
+        if ($foundDirs.Count -eq 1) {
+            $backupDir = $foundDirs[0]
+        } else {
+            $backupDir = Select-DirectoryFromList $foundDirs
         }
-        
-        $backupDir = $foundDirs[0].FullName
-        Write-Host "Directorio encontrado: $backupDir"
-        Copy-Item -Path $backupDir -Destination $repoPath -Recurse -Force
-        Write-Host "Backup generado exitosamente en $repoPath."
+
+        Copy-Item -Path $backupDir.FullName -Destination $repoPath -Recurse -Force
+        Write-Host "Backup copiado exitosamente a $repoPath."
         Pause
     }
+
     "2" {
         Write-Host "`nRestaurando backup..."
 
         if (-Not (Test-Path $repoPath)) {
-            Write-Host "La carpeta 'Repo' no existe en $env:USERPROFILE\AppData\LocalLow\semiwork. Pausando ejecución."
+            Write-Host "La carpeta 'Repo' no existe en $repoPath. Pausando ejecución."
             Pause
             exit
         }
-        
+
         $foundDirs = Get-ChildItem -Path $repoPath -Directory -Filter $backupPattern
-        
+
         if ($foundDirs.Count -eq 0) {
-            Write-Host "No se encontró ningún directorio de guardado en 'Repo'. Pausando ejecución."
+            Write-Host "No se encontró ningún directorio de guardado en 'Repo'."
             Pause
             exit
         }
-        elseif ($foundDirs.Count -gt 1) {
-            Write-Host "Se encontraron múltiples directorios de guardado en 'Repo'. Pausando ejecución."
-            Pause
-            exit
+
+        if ($foundDirs.Count -eq 1) {
+            $backupDir = $foundDirs[0]
+        } else {
+            $backupDir = Select-DirectoryFromList $foundDirs
         }
-        
-        $backupDir = $foundDirs[0].FullName
-        Write-Host "Directorio encontrado: $backupDir"
-        
+
         if (-Not (Test-Path $savesPath)) {
             Write-Host "La carpeta 'saves' no existe, se creará."
             New-Item -Path $savesPath -ItemType Directory | Out-Null
         }
-        Copy-Item -Path $backupDir -Destination $savesPath -Recurse -Force
+
+        Copy-Item -Path $backupDir.FullName -Destination $savesPath -Recurse -Force
         Write-Host "Backup restaurado exitosamente en $savesPath."
         Pause
     }
+
     default {
         Write-Host "Opción no válida. Pausando ejecución."
         Pause
