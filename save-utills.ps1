@@ -16,10 +16,42 @@ function Select-DirectoryFromList($directories) {
     return $directories[$selection - 1]
 }
 
+function Show-ExistingSavesAndBackups {
+    Write-Host ""
+    Write-Host "📁 Partidas guardadas en el juego (carpeta 'saves'):"
+    if (-Not (Test-Path $savesPath)) {
+        Write-Host "- La carpeta 'saves' no existe."
+    } else {
+        $savedDirs = Get-ChildItem -Path $savesPath -Directory -Filter $backupPattern
+        if ($savedDirs.Count -eq 0) {
+            Write-Host "- Sin partidas guardadas"
+        } else {
+            $savedDirs | ForEach-Object { Write-Host "- $($_.Name)" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "💾 Backups actuales (carpeta 'Repo'):"
+    if (-Not (Test-Path $repoPath)) {
+        Write-Host "- La carpeta 'Repo' no existe."
+    } else {
+        $backupDirs = Get-ChildItem -Path $repoPath -Directory -Filter $backupPattern
+        if ($backupDirs.Count -eq 0) {
+            Write-Host "- Sin backups"
+        } else {
+            $backupDirs | ForEach-Object { Write-Host "- $($_.Name)" }
+        }
+    }
+
+    Write-Host ""
+    Pause
+}
+
 Write-Host "Seleccione una opción:"
 Write-Host "1) Generar backup"
 Write-Host "2) Restaurar backup"
-$option = Read-Host "Ingrese 1 o 2"
+Write-Host "3) Ver partidas guardadas y backups"
+$option = Read-Host "Ingrese 1, 2 o 3"
 
 switch ($option) {
     "1" {
@@ -97,6 +129,10 @@ switch ($option) {
         Copy-Item -Path $backupDir.FullName -Destination $savesPath -Recurse -Force
         Write-Host "Backup restaurado exitosamente en $savesPath."
         Pause
+    }
+
+    "3" {
+        Show-ExistingSavesAndBackups
     }
 
     default {
