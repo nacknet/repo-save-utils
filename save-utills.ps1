@@ -18,7 +18,7 @@ function Select-DirectoryFromList($directories) {
 
 function Show-ExistingSavesAndBackups {
     Write-Host ""
-    Write-Host "📁 Partidas guardadas en el juego (carpeta 'saves'):"
+    Write-Host "Partidas guardadas en el juego (carpeta 'saves'):"
     if (-Not (Test-Path $savesPath)) {
         Write-Host "- La carpeta 'saves' no existe."
     } else {
@@ -31,7 +31,7 @@ function Show-ExistingSavesAndBackups {
     }
 
     Write-Host ""
-    Write-Host "💾 Backups actuales (carpeta 'Repo'):"
+    Write-Host "Backups actuales (carpeta 'Repo'):"
     if (-Not (Test-Path $repoPath)) {
         Write-Host "- La carpeta 'Repo' no existe."
     } else {
@@ -58,7 +58,7 @@ switch ($option) {
         Write-Host "`nGenerando backup..."
 
         if (-Not (Test-Path $savesPath)) {
-            Write-Host "La carpeta 'saves' no existe en $repoPath. Pausando ejecución."
+            Write-Host "La carpeta 'saves' no existe en $repoPath. Pausando ejecuci贸n."
             Pause
             exit
         }
@@ -106,7 +106,7 @@ switch ($option) {
         }
 
         if (-Not (Test-Path $savesPath)) {
-            Write-Host "La carpeta 'saves' no existe, se creará."
+            Write-Host "La carpeta 'saves' no existe, se crear谩."
             New-Item -Path $savesPath -ItemType Directory | Out-Null
         }
 
@@ -114,11 +114,11 @@ switch ($option) {
 
         if (Test-Path $targetRestorePath) {
             Write-Host ""
-            Write-Host "⚠️  Atención: Ya existe un directorio con el mismo nombre en 'saves':"
+            Write-Host "  Atencion: Ya existe un directorio con el mismo nombre en 'saves':"
             Write-Host "$($backupDir.Name)"
-            Write-Host "Este proceso sobrescribirá su contenido."
+            Write-Host "Este proceso sobrescribir su contenido."
             Write-Host ""
-            $confirm = Read-Host "¿Desea continuar? Escriba 's' para confirmar"
+            $confirm = Read-Host "Desea continuar? Escriba 's' para confirmar"
             if ($confirm.ToLower() -ne 's') {
                 Write-Host "Restauración cancelada por el usuario. No se hicieron cambios."
                 Pause
@@ -136,7 +136,7 @@ switch ($option) {
     }
 
     default {
-        Write-Host "Opción no válida. Pausando ejecución."
+        Write-Host "Opcion no válida. Pausando ejecución."
         Pause
     }
 }
