@@ -78,6 +78,22 @@ switch ($option) {
             New-Item -Path $savesPath -ItemType Directory | Out-Null
         }
 
+        $targetRestorePath = Join-Path $savesPath $backupDir.Name
+
+        if (Test-Path $targetRestorePath) {
+            Write-Host ""
+            Write-Host "⚠️  Atención: Ya existe un directorio con el mismo nombre en 'saves':"
+            Write-Host "$($backupDir.Name)"
+            Write-Host "Este proceso sobrescribirá su contenido."
+            Write-Host ""
+            $confirm = Read-Host "¿Desea continuar? Escriba 's' para confirmar"
+            if ($confirm.ToLower() -ne 's') {
+                Write-Host "Restauración cancelada por el usuario. No se hicieron cambios."
+                Pause
+                exit
+            }
+        }
+
         Copy-Item -Path $backupDir.FullName -Destination $savesPath -Recurse -Force
         Write-Host "Backup restaurado exitosamente en $savesPath."
         Pause
